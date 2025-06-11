@@ -26,14 +26,12 @@
 </div>
 
     </div>
-
     <div class="border-t pt-4 text-base flex justify-between font-semibold text-gray-800">
       <span>Tổng tiền lượt đi:</span>
       <span class="text-blue-600">{{ formatPrice(selectedSeats.length * trip.price) }}</span>
     </div>
   </div>
 </template>
-
 <script setup>
 defineProps({
   trip: Object,
