@@ -3,12 +3,23 @@ import Home from '../pages/Home.vue'
 import Login from '../pages/Login.vue'
 import Ticket from '../pages/TicketBooking.vue'
 import User from '../pages/User.vue'
-
+import Payment from '../pages/Payment.vue'
+import Schedule from '@/pages/Schedule.vue'
+import TicketLookup from '@/pages/TicketLookup.vue'
+import News from '@/pages/News.vue'
+import Invoices from '@/pages/Invoices.vue'
+import Contact from '@/pages/Contact.vue'
 const routes = [
   { path: '/', component: Home },
   { path: '/login', component: Login },
   { path: '/ticket', component: Ticket },
-  { path: '/user', component: User }
+  { path: '/user', component: User },
+  { path: '/payment', component: Payment },
+   { path: '/schedule', name: 'Schedule', component: Schedule },
+  { path: '/ticket-lookup', name: 'TicketLookup', component: TicketLookup },
+  { path: '/news', name: 'News', component: News },
+  { path: '/invoice', name: 'Invoices', component: Invoices },
+  { path: '/contact', name: 'Contact', component: Contact },
 ]
 
 const router = createRouter({

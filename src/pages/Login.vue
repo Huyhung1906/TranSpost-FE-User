@@ -6,13 +6,14 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import LoginForm from '@/components/LoginForm.vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
+const toast = useToast()
 
 const handleLogin = async ({ username, password }) => {
   try {
@@ -22,23 +23,24 @@ const handleLogin = async ({ username, password }) => {
     })
 
     const { access_token, user } = res.data.data
-    const { fullname } = user
+    const { fullname, id } = user
 
     localStorage.setItem('access_token', access_token)
     localStorage.setItem('fullname', fullname)
+    localStorage.setItem('id', id)
     axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
 
     router.push('/')
-    alert('Đăng nhập thành công!')
+    toast.success('Đăng nhập thành công!')
   } catch (err) {
     console.error(err)
-    alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.')
+    toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.')
   }
 }
 
 const handleRegister = async ({ username, fullname, email, phone, password, role }) => {
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/user/register/`, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/user/register/`, {
       username,
       fullname,
       email,
@@ -47,13 +49,12 @@ const handleRegister = async ({ username, fullname, email, phone, password, role
       role
     })
 
-    alert('Đăng ký thành công! Vui lòng đăng nhập.')
-    // Chuyển sang chế độ login sau khi đăng ký thành công
-    router.push('/login') // hoặc nếu đang ở trang này thì bạn có thể gọi toggleMode từ component con qua event emit, hoặc tự xử lý ở component cha
+    toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
+    router.push('/login')
 
   } catch (err) {
     console.error(err)
-    alert('Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.')
+    toast.error('Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.')
   }
 }
 </script>

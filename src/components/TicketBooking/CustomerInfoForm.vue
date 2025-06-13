@@ -67,18 +67,37 @@
 </template>
 
 <script setup>
-import FormInput from './FormInput.vue' // hoặc đúng đường dẫn tới file
-import { reactive } from 'vue'
+import FormInput from './FormInput.vue'
+import { reactive, watchEffect } from 'vue'
 
-// Biến dữ liệu chính
-const form = reactive({
-  name: '',
-  phone: '',
-  email: '',
-  acceptTerms: false,
+// Nhận props và emit
+const props = defineProps({
+  customer: {
+    type: Object,
+    required: true
+  }
 })
 
-// Biến chứa lỗi
+const emit = defineEmits(['update:customer'])
+
+// Gán dữ liệu vào form
+const form = reactive({
+  name: props.customer.name || '',
+  phone: props.customer.phone || '',
+  email: props.customer.email || '',
+  acceptTerms: false
+})
+
+// Emit khi có thay đổi
+watchEffect(() => {
+  emit('update:customer', {
+    name: form.name,
+    phone: form.phone,
+    email: form.email
+  })
+})
+
+// Lỗi
 const errors = reactive({
   name: '',
   phone: '',
@@ -86,17 +105,15 @@ const errors = reactive({
   acceptTerms: '',
 })
 
-// Hàm kiểm tra định dạng email
+// Validate
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-// Hàm kiểm tra số điện thoại
 function isValidPhone(phone) {
   return /^[0-9]{10}$/.test(phone)
 }
 
-// Xử lý submit
 function handleSubmit() {
   let isValid = true
   errors.name = form.name.trim() ? '' : 'Họ tên không được để trống.'
@@ -104,12 +121,16 @@ function handleSubmit() {
   errors.email = form.email && !isValidEmail(form.email) ? 'Email không hợp lệ.' : ''
   errors.acceptTerms = form.acceptTerms ? '' : 'Bạn phải đồng ý điều khoản.'
 
-  // Nếu có lỗi, không gửi
   isValid = !errors.name && !errors.phone && !errors.email && !errors.acceptTerms
 
   if (isValid) {
     console.log('✅ Dữ liệu hợp lệ:', { ...form })
-    // emit ra ngoài hoặc gọi API tùy theo bạn muốn
+    // Nếu muốn chỉ emit ở đây thay vì watchEffect:
+    // emit('update:customer', {
+    //   name: form.name,
+    //   phone: form.phone,
+    //   email: form.email
+    // })
   } else {
     console.warn('❌ Dữ liệu không hợp lệ.')
   }

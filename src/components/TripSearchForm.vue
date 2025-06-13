@@ -56,10 +56,12 @@
       </select>
 
       <input
-        type="date"
-        v-model="date"
-        class="text-lg px-6 py-3 border border-blue-300 rounded-md focus:outline-none focus:ring-4 focus:ring-blue-300 w-60 transition"
-      />
+  type="date"
+  v-model="date"
+  :min="today"
+  class="text-lg px-6 py-3 border border-blue-300 rounded-md focus:outline-none focus:ring-4 focus:ring-blue-300 w-60 transition"
+/>
+
       <select
         v-model="seats"
         class="text-lg px-6 py-3 border border-blue-300 rounded-md focus:outline-none focus:ring-4 focus:ring-blue-300 w-36 transition"
@@ -84,11 +86,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from "vue-toastification"
+
+const toast = useToast()
+
+const today = new Date().toISOString().substring(0, 10)
 
 const tripType = ref('oneway')
 const from = ref('')
 const to = ref('')
-const date = ref(new Date().toISOString().substring(0, 10))
+const date = ref(today)
 const seats = ref(1)
 
 const routeList = ref([])
@@ -112,13 +119,12 @@ function switchLocations() {
 }
 
 async function submit() {
-  // Tìm route tương ứng từ danh sách
   const matchedRoute = routeList.value.find(
     r => r.departure_point === from.value && r.destination_point === to.value
   )
 
   if (!matchedRoute) {
-    alert('Không tìm thấy tuyến đường phù hợp!')
+    toast.error('Không tìm thấy tuyến đường phù hợp!')
     return
   }
 
@@ -129,6 +135,9 @@ async function submit() {
     const res = await axios.get(apiUrl)
     if (res.data.status === 200) {
       const trips = res.data.data
+      if(trips.length === 0) {
+        toast.info('Không có chuyến xe phù hợp trong ngày đã chọn.')
+      }
       emit('search', {
         trips,
         seats: seats.value,
@@ -138,23 +147,20 @@ async function submit() {
         date: date.value
       })
     } else {
-      alert('Không tìm thấy chuyến xe phù hợp.')
+      toast.error('Không tìm thấy chuyến xe phù hợp.')
     }
   } catch (err) {
     console.error('Lỗi khi tìm chuyến:', err)
-    alert('Lỗi khi gọi API tìm chuyến.')
+    toast.error('Lỗi khi gọi API tìm chuyến.')
   }
 }
 
-
-// Gọi API để lấy danh sách tuyến đường
 onMounted(async () => {
   try {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/route/list`)
     if (res.data.status === 200) {
       routeList.value = res.data.data
 
-      // Trích xuất điểm đi và đến duy nhất
       const departures = new Set()
       const destinations = new Set()
 
@@ -166,37 +172,12 @@ onMounted(async () => {
       departurePoints.value = Array.from(departures)
       destinationPoints.value = Array.from(destinations)
 
-      // Thiết lập mặc định
       from.value = departurePoints.value[0] || ''
       to.value = destinationPoints.value[0] || ''
     }
   } catch (error) {
     console.error('Lỗi khi lấy danh sách tuyến:', error)
+    toast.error('Lỗi khi lấy danh sách tuyến đường.')
   }
 })
-
 </script>
-
-<style scoped>
-@keyframes switch-bumchiu {
-  0% {
-    transform: scale(1) rotate(0deg);
-  }
-  25% {
-    transform: scale(1.3) rotate(15deg);
-  }
-  50% {
-    transform: scale(1.3) rotate(-15deg);
-  }
-  75% {
-    transform: scale(1.3) rotate(15deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-.animate-switch {
-  animation: switch-bumchiu 0.3s ease-in-out forwards;
-}
-</style>

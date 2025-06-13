@@ -1,22 +1,28 @@
 <template>
   <div class="bg-gray-100">
-   <header class="text-white w-full shadow font-sans">
-    <HeaderTop />
-    <Navbar />
-  </header>
-  <Banner />
-  <TripSearchForm @search="handleSearch" />
-  <TripSearchResult :trips="tripList" />
-  <PromotionSection />
-  <HighLight />
-  <Info />
-  <Footer />
-  <ChatWidget />
+    <header class="text-white w-full shadow font-sans">
+      <HeaderTop />
+      <Navbar />
+    </header>
+    <Banner />
+    <TripSearchForm @search="handleSearch" />
+    <TripSearchResult :trips="tripList" />
+    <PromotionSection />
+    <HighLight />
+    <Info />
+    <Footer />
+    <ChatWidget />
+    <button v-show="showBackToTop" @click="scrollToTop"
+      class="fixed bottom-6 right-24 w-16 h-16 rounded-full bg-white border border-gray-300 shadow-lg flex items-center justify-center hover:bg-gray-100 transition-opacity duration-300"
+      aria-label="Back to top">
+      <span class="text-black text-4xl">↑</span>
+    </button>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 import HeaderTop from '@/components/HeaderTop.vue'
 import Navbar from '@/components/Navbar.vue'
@@ -82,4 +88,22 @@ function handleSearch(params) {
     tripList.value = []  // Không có chuyến nào
   }
 }
+
+const showBackToTop = ref(false)
+
+function handleScroll() {
+  showBackToTop.value = window.scrollY > 200
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>

@@ -3,7 +3,11 @@
     <h2 class="text-2xl font-bold mb-4 text-gray-800">🧾 Lịch sử mua vé</h2>
 
     <div v-if="tickets.length" class="space-y-4">
-      <div v-for="ticket in tickets" :key="ticket.id" class="border rounded-lg p-4 hover:shadow transition">
+      <div
+        v-for="ticket in tickets"
+        :key="ticket.id"
+        class="border rounded-lg p-4 hover:shadow transition bg-gray-50"
+      >
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-lg font-semibold text-blue-700">
             {{ ticket.trip.route.departure_point }} → {{ ticket.trip.route.destination_point }}
@@ -23,6 +27,10 @@
             </span>
           </div>
           <div><strong>Giá vé:</strong> {{ formatCurrency(ticket.trip.price) }}</div>
+          <div><strong>Người đi:</strong> {{ ticket.user?.fullname || 'Chưa có' }} - {{ ticket.user?.email }}</div>
+          <div><strong>SĐT:</strong> {{ ticket.passenger_phone }}</div>
+          <div><strong>Email hành khách:</strong> {{ ticket.passenger_email }}</div>
+          <div><strong>Invoice:</strong> {{ ticket.invoice?.code || 'Không có' }}</div>
         </div>
       </div>
     </div>
@@ -48,27 +56,44 @@ const formatDateTime = (datetime: string) => {
   })
 }
 
-const formatCurrency = (amount: string) => {
+const formatCurrency = (amount: string | number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
-  }).format(parseFloat(amount))
+  }).format(typeof amount === 'string' ? parseFloat(amount) : amount)
 }
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
-  if (!token) return
+  if (!token) {
+    console.warn('⚠ Không có token đăng nhập!')
+    return
+  }
 
   try {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/ticket/my-tickets/`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-    tickets.value = res.data.data
+
+    console.log('📦 Dữ liệu từ API:', res.data)
+
+    const list = res.data.data?.data
+    if (Array.isArray(list)) {
+      tickets.value = list
+      console.log(`✅ Đã lấy được ${list.length} vé`)
+    } else {
+      console.error('❗ Trường data.data không phải mảng:', list)
+    }
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách vé:', error)
+    console.error('❌ Lỗi khi gọi API lấy vé:', error)
   }
 })
+
 </script>
 
 <style scoped>
+pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
 </style>
