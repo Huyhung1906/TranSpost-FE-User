@@ -92,11 +92,19 @@ function splitSeatsIntoColumns(seats, layoutCols, prefix) {
   layoutCols.forEach((colCount, colIdx) => {
     for (let i = 0; i < colCount; i++) {
       if (seatIndex >= seats.length) break
+
       const seat = seats[seatIndex]
       const num = String(seat.seat_number).padStart(2, '0')
       const id = `${prefix}${num}`
       const t = ticketMap.value[num]
-      const status = t?.status === 'sold' ? 'sold' : 'available'
+
+      // Xác định trạng thái ghế
+      let status = 'available'
+      if (!t || t.status === 'available') {
+        status = 'available'
+      } else {
+        status = 'sold'  // Không cho chọn các trạng thái khác
+      }
 
       columns[colIdx].push({
         id,
@@ -111,7 +119,6 @@ function splitSeatsIntoColumns(seats, layoutCols, prefix) {
 
   return columns
 }
-
 // Layout cột theo loại xe
 const firstFloorColumns = computed(() => {
   const layout = props.vehicle?.type?.toLowerCase() === 'luxury' ? [6, 5, 6] : [6, 5]

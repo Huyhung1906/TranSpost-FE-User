@@ -10,6 +10,7 @@
         </div>
         <Info />
         <Footer />
+        <ChatWidget />
     </div>
 </template>
 
@@ -18,4 +19,6 @@ import HeaderTop from '@/components/HeaderTop.vue'
 import Navbar from '@/components/Navbar.vue'
 import Info from '@/components/Info.vue'
 import Footer from '@/components/Footer.vue'
+import ChatWidget from '@/components/ChatWidget.vue'
+
 </script>

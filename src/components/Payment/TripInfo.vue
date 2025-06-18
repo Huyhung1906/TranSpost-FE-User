@@ -1,13 +1,22 @@
 <template>
-  <div class="bg-white p-4 rounded shadow mb-4">
-    <h3 class="font-semibold text-lg mb-2">Thông tin lượt đi</h3>
-    <ul>
-      <li><strong>Tuyến xe:</strong> Quảng Ngãi - Miền Tây</li>
-      <li><strong>Thời gian xuất bến:</strong> 13:00 13/06/2025</li>
-      <li><strong>Số ghế:</strong> 2 Ghế (B09, B10)</li>
-      <li><strong>Điểm lên xe:</strong> Quảng Ngãi</li>
-      <li><strong>Thời gian tới điểm:</strong> Trước 12:45 13/06/2025</li>
-      <li><strong>Điểm trả khách:</strong> BX Miền Tây</li>
-    </ul>
+  <div v-if="booking" class="bg-white p-4 rounded shadow mb-4">
+    <h3 class="font-semibold text-lg mb-2">Thông tin chuyến đi</h3>
+    <p><strong>Tuyến:</strong> {{ booking.trip.route.departure_point }} → {{ booking.trip.route.destination_point }}</p>
+    <p><strong>Thời gian khởi hành:</strong> {{ formatDateTime(booking.trip.departure_time) }}</p>
+    <p><strong>Xe:</strong> {{ booking.trip.vehicle.name }} ({{ booking.trip.vehicle.licenseplate }})</p>
+    <p><strong>Điểm đón:</strong> {{ booking.pickup_point.pickup }}</p> <!-- ✅ Thêm dòng này -->
   </div>
 </template>
+
+<script setup lang="ts">
+import { defineProps } from 'vue'
+
+defineProps<{
+  booking: any
+}>()
+
+function formatDateTime(datetime: string) {
+  const date = new Date(datetime)
+  return date.toLocaleString('vi-VN', { hour12: false })
+}
+</script>

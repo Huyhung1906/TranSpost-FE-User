@@ -9,18 +9,33 @@ import TicketLookup from '@/pages/TicketLookup.vue'
 import News from '@/pages/News.vue'
 import Invoices from '@/pages/Invoices.vue'
 import Contact from '@/pages/Contact.vue'
+import PaymentSuccess from '@/pages/PaymentSuccess.vue'
+import PaymentFail from '@/pages/PaymentFail.vue'
+
+
 const routes = [
   { path: '/', component: Home },
   { path: '/login', component: Login },
   { path: '/ticket', component: Ticket },
   { path: '/user', component: User },
-  { path: '/payment', component: Payment },
+  { path: '/payment', name: 'PaymentPage',component: Payment },
    { path: '/schedule', name: 'Schedule', component: Schedule },
   { path: '/ticket-lookup', name: 'TicketLookup', component: TicketLookup },
   { path: '/news', name: 'News', component: News },
   { path: '/invoice', name: 'Invoices', component: Invoices },
   { path: '/contact', name: 'Contact', component: Contact },
+  {
+    path: '/payment/success',
+    name: 'PaymentSuccess',
+    component: PaymentSuccess,
+  },
+  {
+    path: '/payment/fail',
+    name: 'PaymentFail',
+    component: PaymentFail,
+  }
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),
